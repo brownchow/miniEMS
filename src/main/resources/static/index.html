@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>EMS 实时监控</title>
+</head>
+<body>
+<h2>EMS 实时遥测</h2>
+<pre id="output"></pre>
+
+<script>
+    const ws = new WebSocket("ws://localhost:8080/ws/telemetry");
+    ws.onmessage = function (event) {
+        document.getElementById("output").innerText =
+            JSON.stringify(JSON.parse(event.data), null, 2);
+    };
+</script>
+</body>
+</html>

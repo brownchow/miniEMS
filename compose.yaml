@@ -1,9 +1,174 @@
 services:
+  # PostgreSQL Database
   postgres:
-    image: 'postgres:latest'
+    image: postgres:16-alpine
+    container_name: miniems-postgres
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      POSTGRES_DB: mini_ems
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - '5432'
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ems-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: miniems-redis
+    command: redis-server --requirepass MiniEms@123
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ems-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # MQTT Broker (Eclipse Mosquitto)
+  mqtt:
+    image: eclipse-mosquitto:2
+    container_name: miniems-mqtt
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+    networks:
+      - ems-network
+    healthcheck:
+      test: [ "CMD-SHELL", "mosquitto_sub -t '$$SYS/#' -C 1 | grep -v Error || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # InfluxDB 2.x Time Series Database
+  influxdb:
+    image: influxdb:2.7
+    container_name: miniems-influxdb
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: admin123456
+      DOCKER_INFLUXDB_INIT_ORG: ems-org
+      DOCKER_INFLUXDB_INIT_BUCKET: ems
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ems-token
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+      - influxdb_config:/etc/influxdb2
+    networks:
+      - ems-network
+    healthcheck:
+      test: [ "CMD", "influx", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Grafana Visualization
+  grafana:
+    image: grafana/grafana:10.2.3
+    container_name: miniems-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: grafana-clock-panel
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - influxdb
+    networks:
+      - ems-network
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Modbus Battery Simulator
+  modbus-simulator:
+    build:
+      context: ./modbus-simulator
+      dockerfile: Dockerfile
+    container_name: miniems-modbus-simulator
+    environment:
+      MODBUS_PORT: 502
+      MQTT_BROKER: tcp://mqtt:1883          # ← 改这里！加 tcp://
+      MQTT_TOPIC: ems/bms/telemetry
+      PUBLISH_INTERVAL: 5000
+    depends_on:
+      - mqtt
+    networks:
+      - ems-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pgrep -f java || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # miniEMS Backend Service
+  miniems:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: miniems-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mini_ems
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_REDIS_PASSWORD: MiniEms@123
+      MQTT_BROKER_URL: tcp://mqtt:1883
+      INFLUXDB_URL: http://influxdb:8086
+      INFLUXDB_TOKEN: ems-token
+      INFLUXDB_ORG: ems-org
+      INFLUXDB_BUCKET: ems
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mqtt:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+    networks:
+      - ems-network
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+volumes:
+  postgres_data:
+  redis_data:
+  mosquitto_data:
+  mosquitto_log:
+  influxdb_data:
+  influxdb_config:
+  grafana_data:
+
+networks:
+  ems-network:
+    driver: bridge

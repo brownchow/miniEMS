@@ -2,17 +2,44 @@ server:
   port: 8080
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   application:
     name: miniEMS
 
   datasource:
-    url: jdbc:postgresql://172.22.18.29:5432/mini_ems
-    username: postgres
-    password: postgres
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://172.22.18.29:5432/mini_ems}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
   data:
     redis:
-      host: 172.22.18.29
-      port: 6379
-      password: MiniEms@123
+      host: ${SPRING_REDIS_HOST:172.22.18.29}
+      port: ${SPRING_REDIS_PORT:6379}
+      password: ${SPRING_REDIS_PASSWORD:MiniEms@123}
+
+# MQTT Configuration
+mqtt:
+  broker:
+    url: ${MQTT_BROKER_URL:tcp://localhost:1883}
+  client:
+    id: miniEMS-${random.value}
+  topic: ${MQTT_TOPIC:ems/bms/telemetry}
+
+# InfluxDB Configuration
+influxdb:
+  url: ${INFLUXDB_URL:http://influxdb:8086}
+  token: ${INFLUXDB_TOKEN:ems-token}
+  org: ${INFLUXDB_ORG:ems-org}
+  bucket: ${INFLUXDB_BUCKET:ems}
+
+# Actuator endpoints for health check
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
