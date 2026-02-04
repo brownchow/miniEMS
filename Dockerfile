@@ -4,6 +4,9 @@ FROM maven:3.9-eclipse-temurin-21 AS builder
 
 WORKDIR /app
 
+# Configure Maven mirror for China mainland
+COPY maven-settings.xml /root/.m2/settings.xml
+
 # Copy pom.xml first to leverage Docker cache
 COPY pom.xml .
 

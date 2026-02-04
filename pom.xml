@@ -74,11 +74,11 @@
             <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
             <version>1.2.5</version>
         </dependency>
-        <!-- Modbus4j for battery simulator -->
+        <!-- jamod for modbus communication -->
         <dependency>
-            <groupId>com.infiniteautomation</groupId>
-            <artifactId>modbus4j</artifactId>
-            <version>3.1.0</version>
+            <groupId>com.ghgande</groupId>
+            <artifactId>j2mod</artifactId>
+            <version>3.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

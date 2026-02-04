@@ -2,20 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <!--    modbus4j 私有仓库地址-->
-    <repositories>
-        <repository>
-            <id>mangoautomation</id>
-            <url>https://maven.mangoautomation.net/repository/ias-release/</url>
-        </repository>
-    </repositories>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.sysbreak</groupId>
     <artifactId>modbus-simulator</artifactId>
     <version>1.0.0</version>
     <name>Modbus Battery Simulator</name>
-    <description>Modbus4j Battery Simulator for EMS</description>
+    <description>j2mod Battery Simulator for EMS</description>
 
     <properties>
         <java.version>21</java.version>
@@ -25,11 +18,14 @@
     </properties>
 
     <dependencies>
-        <!-- 目前最推荐的官方 3.1 系列版本 -->
+        <!-- j2mod for Modbus TCP communication -->
         <dependency>
-            <groupId>com.infiniteautomation</groupId>
-            <artifactId>modbus4j</artifactId>
-            <version>3.1.0</version>
+            <groupId>com.ghgande</groupId>
+            <artifactId>j2mod</artifactId>
+            <!-- 改成下面任一（建议最新的稳定版） -->
+            <version>3.2.1</version>   <!-- 2024年版本，比较稳 -->
+            <!-- 或 -->
+            <!-- <version>3.3.0</version> -->  <!-- 2025年底最新版 -->
         </dependency>
 
         <!-- Eclipse Paho MQTT Client -->
