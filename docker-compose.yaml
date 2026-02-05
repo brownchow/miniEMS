@@ -105,7 +105,7 @@ services:
   modbus-simulator:
     image: sysbreak/modbus-simulator:1.0.0
     build:
-      context: ../modbus-simulator
+      context: ../modbus-simulator  # 需要将电池模拟器代码放到上层目录
       dockerfile: Dockerfile
     container_name: miniems-modbus-simulator
     environment:
