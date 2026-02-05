@@ -1,6 +1,7 @@
 package com.sysbreak.ems.model;
 
-import lombok.Data;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 /**
  * 电池管理系统（BMS）遥测数据模型
@@ -9,6 +10,11 @@ import lombok.Data;
  * @since 2026-01-16
  */
 @Data
+@ToString
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class BmsTelemetry {
 
     /**

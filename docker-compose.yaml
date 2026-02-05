@@ -103,29 +103,16 @@ services:
 
   # Modbus Battery Simulator
   modbus-simulator:
+    image: sysbreak/modbus-simulator:1.0.0
     build:
-      context: ./modbus-simulator
+      context: ../modbus-simulator
       dockerfile: Dockerfile
     container_name: miniems-modbus-simulator
     environment:
       MODBUS_PORT: 502
-      MQTT_BROKER: tcp://mqtt:1883          # ← 改这里！加 tcp://
+      MQTT_BROKER: tcp://mqtt:1883
       MQTT_TOPIC: ems/bms/telemetry
       PUBLISH_INTERVAL: 5000
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mini_ems
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
-      SPRING_REDIS_PASSWORD: MiniEms@123
-      MQTT_BROKER_URL: tcp://mqtt:1883
-      INFLUXDB_URL: http://influxdb:8086
-      INFLUXDB_TOKEN: ems-token
-      INFLUXDB_ORG: ems-org
-      INFLUXDB_BUCKET: ems
-      MODBUS_MODE: tcp
-      MODBUS_TCP_HOST: modbus-simulator
-      MODBUS_TCP_PORT: 502
     depends_on:
       - mqtt
     networks:
