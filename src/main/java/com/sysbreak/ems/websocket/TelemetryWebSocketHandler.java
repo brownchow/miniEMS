@@ -9,6 +9,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * 遥测数据 WebSocket 推送
+ *
+ * @author sysbreak
+ * @since 2026-01-16
  */
 @Slf4j
 @Component

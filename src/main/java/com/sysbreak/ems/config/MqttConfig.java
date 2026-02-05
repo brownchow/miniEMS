@@ -14,6 +14,9 @@ import org.springframework.messaging.MessageChannel;
 /**
  * MQTT 终极配置类
  * 放弃所有自动配置，手动物理连接适配器与处理器
+ *
+ * @author sysbreak
+ * @since 2026-01-16
  */
 @Configuration
 public class MqttConfig {

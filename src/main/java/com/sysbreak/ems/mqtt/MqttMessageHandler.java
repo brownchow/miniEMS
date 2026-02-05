@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * MQTT 消息处理入口
+ *
+ * @author sysbreak
+ * @since 2026-01-16
  */
 @Slf4j
 @Component
