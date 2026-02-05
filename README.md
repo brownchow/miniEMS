@@ -113,6 +113,38 @@ docker compose ps
 docker compose logs -f miniems
 ```
 
+## 代码更新与重新编译
+
+### Docker Compose 的重新编译行为
+
+**`docker compose up -d` 本身不会自动重新编译**：
+- 如果镜像已经存在，Docker Compose 不会重新构建镜像，只会启动容器
+- 如果代码被修改了，使用 `docker compose up -d` 不会触发重新编译
+
+### 强制重新编译的方法
+
+**1. 使用 `--build` 标志（推荐）**：
+```bash
+docker compose up -d --build
+```
+
+**2. 或者先构建再启动**：
+```bash
+docker compose build
+docker compose up -d
+```
+
+**3. 使用 Docker Compose Watch（推荐用于开发环境）**：
+```bash
+docker compose up --watch
+```
+这会自动监听文件变化并触发重新构建，无需手动执行构建命令。
+
+### 开发建议
+
+- **开发时**：使用 `docker compose up --watch` 实现代码修改后自动重新编译
+- **部署时**：使用 `docker compose up -d --build` 确保镜像是最新的
+
 ## 相关文档
 
 - `compose.yaml` - Docker Compose编排文件
