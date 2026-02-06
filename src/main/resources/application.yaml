@@ -43,3 +43,10 @@ management:
   endpoint:
     health:
       show-details: always
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.sysbreak.ems: DEBUG
+    org.springframework.integration: DEBUG
