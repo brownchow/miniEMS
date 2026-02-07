@@ -56,7 +56,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "${DS_EMS-INFLUX}"
+        "uid": "a290047c-b852-4fc5-a344-27d74816f0ee"
       },
       "description": "电池荷电状态",
       "fieldConfig": {
@@ -136,7 +136,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "${DS_EMS-INFLUX}"
+            "uid": "a290047c-b852-4fc5-a344-27d74816f0ee"
           },
           "query": "",
           "refId": "A"
@@ -144,7 +144,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "${DS_EMS-INFLUX}"
+            "uid": "a290047c-b852-4fc5-a344-27d74816f0ee"
           },
           "hide": false,
           "query": "from(bucket: \"ems\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bms_telemetry\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"soc\")",
@@ -157,7 +157,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "${DS_EMS-INFLUX}"
+        "uid": "a290047c-b852-4fc5-a344-27d74816f0ee"
       },
       "description": "温度趋势图",
       "fieldConfig": {
@@ -237,7 +237,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "${DS_EMS-INFLUX}"
+            "uid": "a290047c-b852-4fc5-a344-27d74816f0ee"
           },
           "query": "from(bucket: \"ems\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bms_telemetry\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"temperature\")",
           "refId": "A"
@@ -249,7 +249,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "${DS_EMS-INFLUX}"
+        "uid": "a290047c-b852-4fc5-a344-27d74816f0ee"
       },
       "description": "电压趋势图",
       "fieldConfig": {
@@ -329,7 +329,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "${DS_EMS-INFLUX}"
+            "uid": "a290047c-b852-4fc5-a344-27d74816f0ee"
           },
           "query": "from(bucket: \"ems\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bms_telemetry\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"voltage\")",
           "refId": "A"

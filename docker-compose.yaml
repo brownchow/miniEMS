@@ -84,13 +84,19 @@ services:
     image: grafana/grafana:10.2.3
     container_name: miniems-grafana
     environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      # 允许 iframe 嵌入
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      # 允许匿名访问
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_NAME=Main Org.
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
     ports:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning  # 新增，用于恢复 EMS Dashboard
+      - ./grafana/provisioning:/etc/grafana/provisioning
     depends_on:
       - influxdb
     networks:
