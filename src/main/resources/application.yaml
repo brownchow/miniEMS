@@ -7,34 +7,36 @@ spring:
   application:
     name: miniEMS
 
+  # 数据库配置（PostgreSQL）
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://172.22.18.29:5432/mini_ems}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    url: jdbc:postgresql://172.22.18.29:5432/mini_ems
+    username: postgres
+    password: postgres
     driver-class-name: org.postgresql.Driver
 
+  # Redis配置
   data:
     redis:
-      host: ${SPRING_REDIS_HOST:172.22.18.29}
-      port: ${SPRING_REDIS_PORT:6379}
-      password: ${SPRING_REDIS_PASSWORD:MiniEms@123}
+      host: 172.22.18.29
+      port: 6379
+      password: MiniEms@123
 
-# MQTT Configuration
+# MQTT配置
 mqtt:
   broker:
-    url: ${MQTT_BROKER_URL:tcp://localhost:1883}
+    url: tcp://localhost:1883  # 如果是 mqtt 表示容器的名字
   client:
     id: miniEMS-${random.value}
-  topic: ${MQTT_TOPIC:ems/bms/telemetry}
+  topic: ems/bms/telemetry
 
-# InfluxDB Configuration
+# InfluxDB时序数据库配置
 influxdb:
-  url: ${INFLUXDB_URL:http://influxdb:8086}
-  token: ${INFLUXDB_TOKEN:ems-token}
-  org: ${INFLUXDB_ORG:ems-org}
-  bucket: ${INFLUXDB_BUCKET:ems}
+  url: http://127.0.0.1:8086  # 如果是 influxdb 表示容器的名字
+  token: ems-token
+  org: ems-org
+  bucket: ems
 
-# Actuator endpoints for health check
+# Actuator健康检查端点配置
 management:
   endpoints:
     web:
