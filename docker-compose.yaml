@@ -66,6 +66,7 @@ services:
       DOCKER_INFLUXDB_INIT_ORG: ems-org
       DOCKER_INFLUXDB_INIT_BUCKET: ems
       DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ems-token
+      TZ: Asia/Shanghai
     ports:
       - "8086:8086"
     volumes:
@@ -92,9 +93,10 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_NAME=Main Org.
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-      # 子路径配置
-      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s/grafana
-      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      # 直接使用根路径访问
+      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s
+      - GF_SERVER_SERVE_FROM_SUB_PATH=false
+      - TZ=Asia/Shanghai
     ports:
       - "3000:3000"
     volumes:
@@ -130,22 +132,64 @@ services:
 # 2. 启动服务: docker compose up -d
 # 3. 更新前端: cd frontend && ./build-frontend.sh && docker compose restart nginx
 
-  # Modbus Battery Simulator
-  modbus-simulator:
+  # Modbus Battery Simulator (实例1)
+  modbus-simulator-1:
     image: sysbreak/modbus-simulator:1.0.0
     build:
-      context: ../modbus-simulator  # 需要将电池模拟器代码放到上层目录
+      context: ../modbus-simulator
       dockerfile: Dockerfile
-    container_name: miniems-modbus-simulator
+    container_name: miniems-modbus-simulator-1
     environment:
-      MODBUS_PORT: 502
+      MODBUS_PORT: 1502
       MQTT_BROKER: tcp://mqtt:1883
       MQTT_TOPIC: ems/bms/telemetry
+      MQTT_CLIENT_ID: modbus-simulator-1
+      MQTT_DEVICE_ID: BMS-001
       PUBLISH_INTERVAL: 5000
+      LOGGING_FILE_PATH: /var/log/modbus-simulator
+      TZ: Asia/Shanghai
+    ports:
+      - "1502:1502"
+    volumes:
+      - modbus-simulator-1-logs:/var/log/modbus-simulator
     depends_on:
       - mqtt
     networks:
       - ems-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pgrep -f java || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Modbus Battery Simulator (实例2) - 可选，如需多个生产者可启用
+  modbus-simulator-2:
+    image: sysbreak/modbus-simulator:1.0.0
+    build:
+      context: ../modbus-simulator
+      dockerfile: Dockerfile
+    container_name: miniems-modbus-simulator-2
+    environment:
+      MODBUS_PORT: 1503
+      MQTT_BROKER: tcp://mqtt:1883
+      MQTT_TOPIC: ems/bms/telemetry
+      MQTT_CLIENT_ID: modbus-simulator-2
+      MQTT_DEVICE_ID: BMS-002
+      PUBLISH_INTERVAL: 5000
+      LOGGING_FILE_PATH: /var/log/modbus-simulator
+      TZ: Asia/Shanghai
+    ports:
+      - "1503:1503"
+    volumes:
+      - modbus-simulator-2-logs:/var/log/modbus-simulator
+    depends_on:
+      - mqtt
+    networks:
+      - ems-network
+    # 注意：使用 profiles 避免与实例1同时启动导致日志文件冲突
+    # 默认只启动实例1，需要多个模拟器时加上 --profile multi-simulator 参数
+    profiles:
+      - multi-simulator
     healthcheck:
       test: [ "CMD-SHELL", "pgrep -f java || exit 1" ]
       interval: 30s
@@ -166,12 +210,13 @@ services:
       SPRING_REDIS_PORT: 6379
       SPRING_REDIS_PASSWORD: MiniEms@123
       MQTT_BROKER_URL: tcp://mqtt:1883
-      INFLUXDB_URL: http://127.0.0.1:8086  # 如果是 influxdb，表示容器地址
+      INFLUXDB_URL: http://influxdb:8086
       INFLUXDB_TOKEN: ems-token
       INFLUXDB_ORG: ems-org
       INFLUXDB_BUCKET: ems
+      TZ: Asia/Shanghai
     ports:
-      - "8080:8080"
+      - "8081:8081"
     depends_on:
       postgres:
         condition: service_healthy
@@ -184,7 +229,7 @@ services:
     networks:
       - ems-network
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1" ]
+      test: [ "CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8081/actuator/health || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -198,6 +243,8 @@ volumes:
   influxdb_data:
   influxdb_config:
   grafana_data:
+  modbus-simulator-1-logs:
+  modbus-simulator-2-logs:
 
 networks:
   ems-network:

@@ -16,7 +16,7 @@ RUN mvn dependency:go-offline -B
 # Copy source code
 COPY src ./src
 
-# Build the application
+# Build the application with assembly
 RUN mvn clean package -DskipTests -B
 
 # Stage 2: Runtime stage
@@ -24,24 +24,28 @@ FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
+# Install bash for start script
+RUN apk add --no-cache bash
+
 # Create non-root user
 RUN addgroup -S spring && adduser -S spring -G spring
 
-# Copy built JAR from builder stage
-COPY --from=builder /app/target/*.jar app.jar
+# Copy the assembled application structure
+COPY --from=builder /app/target/ems-0.0.1-bin/. .
 
-# Change ownership
-RUN chown -R spring:spring /app
+# Create logs directory
+RUN mkdir -p /app/logs && \
+    chown -R spring:spring /app
 
 # Switch to non-root user
 USER spring:spring
 
 # Expose port
-EXPOSE 8080
+EXPOSE 8081
 
 # Health check endpoint
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost:8080/actuator/health || exit 1
+  CMD wget --quiet --tries=1 --spider http://localhost:8081/actuator/health || exit 1
 
-# Run the application
-ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]
+# Run the application using start script
+ENTRYPOINT ["/app/bin/start.sh"]
