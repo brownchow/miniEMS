@@ -19,7 +19,7 @@
           </template>
           <!-- 嵌入 Grafana 仪表板（通过 Nginx 代理） -->
           <iframe
-            src="/grafana/d/b048eb23-2969-42c5-84f1-9c4a8d520b4b/emse4bbaa-e8a1a8-e79b98"
+            src="/d/eac1ccf2-f958-49c6-96c2-3fec48850ad4"
             width="100%"
             height="600"
             frameborder="0"
