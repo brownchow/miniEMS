@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    url: http://miniems-influxdb:8086
+    user: admin
+    database: ems
+    basicAuth: false
+    isDefault: true
+    jsonData:
+      httpMode: POST
+      organization: ems-org
+      token: ems-token
+    secureJsonData:
+      password: admin123456

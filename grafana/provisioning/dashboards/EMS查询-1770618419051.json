@@ -1,35 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_EMS-INFLUX",
-      "label": "EMS-Influx",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "influxdb",
-      "pluginName": "InfluxDB"
-    }
-  ],
-  "__elements": {},
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "10.2.3"
-    },
-    {
-      "type": "datasource",
-      "id": "influxdb",
-      "name": "InfluxDB",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "timeseries",
-      "name": "Time series",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": [
       {
@@ -46,19 +15,20 @@
       }
     ]
   },
+  "description": "EMS查询",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": null,
+  "id": 1,
   "links": [],
   "liveNow": false,
   "panels": [
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "a290047c-b852-4fc5-a344-27d74816f0ee"
+        "uid": "e8692352-105b-4aa4-9ed0-01b1ef4a1a90"
       },
-      "description": "电池荷电状态",
+      "description": "温度查询",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -119,107 +89,6 @@
         "x": 0,
         "y": 0
       },
-      "id": 1,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "a290047c-b852-4fc5-a344-27d74816f0ee"
-          },
-          "query": "",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "a290047c-b852-4fc5-a344-27d74816f0ee"
-          },
-          "hide": false,
-          "query": "from(bucket: \"ems\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bms_telemetry\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"soc\")",
-          "refId": "B"
-        }
-      ],
-      "title": "SOC 电量",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "a290047c-b852-4fc5-a344-27d74816f0ee"
-      },
-      "description": "温度趋势图",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 0
-      },
       "id": 3,
       "options": {
         "legend": {
@@ -237,21 +106,21 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "a290047c-b852-4fc5-a344-27d74816f0ee"
+            "uid": "e8692352-105b-4aa4-9ed0-01b1ef4a1a90"
           },
-          "query": "from(bucket: \"ems\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bms_telemetry\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"temperature\")",
+          "query": "from(bucket: \"ems\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r._measurement == \"bms_telemetry\")\r\n  |> filter(fn: (r) => r.deviceId == \"${deviceId}\")\r\n  |> filter(fn: (r) => r._field == \"temperature\")",
           "refId": "A"
         }
       ],
-      "title": "温度",
+      "title": "温度查询",
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "a290047c-b852-4fc5-a344-27d74816f0ee"
+        "uid": "e8692352-105b-4aa4-9ed0-01b1ef4a1a90"
       },
-      "description": "电压趋势图",
+      "description": "电压查询",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -329,30 +198,148 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "a290047c-b852-4fc5-a344-27d74816f0ee"
+            "uid": "e8692352-105b-4aa4-9ed0-01b1ef4a1a90"
           },
-          "query": "from(bucket: \"ems\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bms_telemetry\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"voltage\")",
+          "query": "from(bucket: \"ems\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r._measurement == \"bms_telemetry\")\r\n  |> filter(fn: (r) => r.deviceId == \"${deviceId}\")\r\n  |> filter(fn: (r) => r._field == \"voltage\")",
           "refId": "A"
         }
       ],
-      "title": "电压",
+      "title": "电压查询",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e8692352-105b-4aa4-9ed0-01b1ef4a1a90"
+      },
+      "description": "SOC电量",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e8692352-105b-4aa4-9ed0-01b1ef4a1a90"
+          },
+          "query": "from(bucket: \"ems\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r._measurement == \"bms_telemetry\")\r\n  |> filter(fn: (r) => r.deviceId == \"${deviceId}\")\r\n  |> filter(fn: (r) => r._field == \"soc\")",
+          "refId": "A"
+        }
+      ],
+      "title": "SOC电量",
       "type": "timeseries"
     }
   ],
-  "refresh": "",
+  "refresh": "5s",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "BMS-002",
+          "value": "BMS-002"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "e8692352-105b-4aa4-9ed0-01b1ef4a1a90"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\r\nschema.tagValues(bucket: \"ems\", tag: \"deviceId\")",
+        "description": "设备id",
+        "hide": 0,
+        "includeAll": false,
+        "label": "设备id",
+        "multi": false,
+        "name": "deviceId",
+        "options": [],
+        "query": "import \"influxdata/influxdb/schema\"\r\nschema.tagValues(bucket: \"ems\", tag: \"deviceId\")",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-6h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
-  "title": "ems仪表盘",
-  "uid": "b048eb23-2969-42c5-84f1-9c4a8d520b4b",
-  "version": 5,
+  "title": "EMS查询",
+  "uid": "eac1ccf2-f958-49c6-96c2-3fec48850ad4",
+  "version": 7,
   "weekStart": ""
 }
